@@ -1,31 +1,72 @@
-import { useEffect, useState } from "react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { useEffect, useState } from "react";
+import { useFetch } from "../utils/mixin";
+import { Link } from "react-router-dom";
+
 
 function sale() {
 
     const [ProductSale, setProductSale] = useState([]);
-    const [TableData, setTableData] = useState("");
+    const [years, setYears] = useState([]);
+    const [TableData, setTableData] = useState([]);
+    const [Revenue, setRevenue] = useState([]);
+    
+    const currentYear = new Date().getFullYear();
+    const [selectedYear, setSelectedYear] = useState(currentYear);
 
-    async function getData() {
-        const response = await fetch("");
-        const data = await response.json();
-        setProductSale(data.data);
-        setTableData(data.data);
-    }
+    const _fetch = useFetch();
 
     useEffect(() => {
-        getData();
+        const response = _fetch('GET', '/analysis/sale/year', {}, (resp) => {
+            if (resp.status) {
+                setYears(resp.years);
+
+                if(resp.years.includes(currentYear)) {
+                    setSelectedYear(currentYear);
+                }
+            }
+        })
     }, []);
+
+    useEffect(() => {
+        if (selectedYear) {
+            const response = _fetch('GET', `/analysis/sale/monthly/${selectedYear}`, {}, (resp) => {
+                if (resp.status) {
+                    // console.log(resp.graph);
+                    const formattedData = resp.graph.map((item) => ({
+                        name: item.month_name || `Month ${item.month}`,
+                        pv: item.total
+                    }))
+                    setProductSale(formattedData);
+                }
+            })
+        }
+
+        const response1 = _fetch('GET', `/analysis/sale/details/${selectedYear}`, {}, (resp) => {
+            if (resp.status) {
+                // console.log(resp);
+                setTableData(resp.sales);
+            }
+        })
+
+        const response2 = _fetch('GET', `/analysis/sale/revenue/${selectedYear}`, {}, (resp) => {
+            if (resp.status) {
+                // console.log(resp);
+                setRevenue(resp.revenue);
+            }
+        })
+    }, [selectedYear]);
 
     return(
         <div className="">
             <div className="py-5 bg-white shadow">
                 <div className="flex justify-between px-5">
                     <p className="text-lg font-medium">Sales</p>
-                    <select name="" id="" className="border p-1 rounded text-sm">
-                        <option value="">Months</option>
-                        <option value="">Jan</option>
-                        <option value="">Feb</option>
+                    <select value={selectedYear} name="" onChange={(e) => setSelectedYear(Number(e.target.value))} className="border p-1 rounded text-sm">
+                        <option value="">Select Year</option>
+                        {years.map((year, index) => (
+                            <option value={year} key={index}>{year}</option>
+                        ))}
                     </select>
                 </div>
 
@@ -36,25 +77,27 @@ function sale() {
                             <XAxis dataKey="name" />
                             <YAxis />
                             <Tooltip />
-                            <Area type="monotone" dataKey="pv"></Area>
+                            <Area key="pv" type="monotone" dataKey="pv" stroke="#8884d8" fill="#8884d8"></Area>
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>
             </div>
-
-           <div>
-                <p className="my-1 pt-2 text-xl font-medium">Target Prediction</p>
-                <div className="p-4 rounded-lg shadow bg-white">
-                    <p className="py-2 text-2xl font-bold text-center">&#8377; 10,00,000</p>
-                    <div>
-                        <div className="flex justify-between">
-                            <p>53%</p>
-                            <p>&#8377; 5,00,000</p>
+            
+            <Link to="/revenue">
+                <div>
+                    <p className="my-1 pt-2 text-xl font-medium">Target Prediction</p>
+                    <div className="p-4 rounded-lg shadow bg-white">
+                        <p className="py-2 text-2xl font-bold text-center">&#8377; {Revenue.collected_amount}</p>
+                        <div>
+                            <div className="flex justify-between">
+                                <p>50%</p>
+                                <p>&#8377; 2,00,0000</p>
+                            </div>
+                            <meter value="50" min="0" max="100" className="w-full rounded h-5 "></meter>
                         </div>
-                        <meter value="52" min="0" max="100" className="w-full rounded h-5 "></meter>
                     </div>
                 </div>
-           </div>
+            </Link>
             
             <div>
                 <p className="my-1 pt-2 text-xl font-medium">Total sales</p>
@@ -70,15 +113,15 @@ function sale() {
                             </tr>
                         </thead>
                         <tbody>
-                            {/* {TableData.map((item, index) => ( */}
-                                {/* <tr key={index}>
-                                    <td>{item.date || "N/A"}</td>
-                                    <td>{item.name || "N/A"}</td>
+                            {TableData?.map((item, index) => (
+                                <tr key={index}>
+                                    <td>{item.sold_date ? new Date(item.sold_date).toLocaleDateString() : "N/A"}</td>
+                                    <td>{item.product_name || "N/A"}</td>
                                     <td>{item.quantity || "N/A"}</td>
-                                    <td>{item.sales || "N/A"}</td>
-                                    <td>{item.amount || "N/A"}</td>
-                                    </tr> */}
-                            {/* ))} */}
+                                    <td>{item.total_sale || "N/A"}</td>
+                                    <td>{item.total_price || "N/A"}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
