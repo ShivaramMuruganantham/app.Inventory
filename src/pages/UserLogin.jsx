@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { FormValidateField } from "../utils/mixins/FormValidte";
+import { LoginValidate } from "../utils/mixins/FormValidte";
 import { useNavigate } from "react-router-dom";
+import { useFetch } from "../utils/mixin.js";
+
 import axios from "axios";
 import Input from "../components/form/input";
 
@@ -12,6 +14,8 @@ function UserLogin() {
     });
 
     const [formErrors, setformErrors] = useState({});
+
+    const _fetch = useFetch();
 
     const navigate = useNavigate();
 
@@ -26,8 +30,8 @@ function UserLogin() {
         e.preventDefault()
         
         const loginError = {
-            email: FormValidateField("email", formData.email),
-            password: FormValidateField("password", formData.password)
+            email: LoginValidate("email", formData.email),
+            password: LoginValidate("password", formData.password)
         }
 
         if (loginError.email || loginError.password) {
@@ -36,35 +40,47 @@ function UserLogin() {
         }
 
         try {
-            const response = await fetch("https://webhook.site/9571c062-4ba5-4775-9c6f-8f879c7af04b", {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
+            const response = await _fetch('POST', '/user/login', formData, (resp) => {
+               if(resp.status) {
+                    console.log(resp);
+                    alert(resp.message);
+                    localStorage.setItem("user_data", JSON.stringify({user: resp.user.name, token: resp.user.api_token}));
+                    navigate("/dashboard");
+               }
+               else {
+                    alert(resp.message);
+               }
             })
-            // if(response.ok) {
-                alert("Login Success");
-                // console.log(response.data, "Login Success");
-                return navigate("/dashboard");
-            // }
         }
         catch(error) {
             console.log("Login Failed", error);
-        }
-
+        }  
     }
     return (
         <div>
-            <form onSubmit={handleSubmit}>
-                <Input label="Email" name="email" type="email" placeholder="Enter your email" className="border" onChange={handleChange} />
-                {formErrors.email && <p className="text-red-500">{formErrors.email}</p>}
-
-                <Input label="Password" name="password" type="password" placeholder="Enter your password" className="border" onChange={handleChange} />
-                {formErrors.password && <p className="text-red-500">{formErrors.password}</p>}
-                <button type="submit">Login</button>
-            </form>
+            <div className="flex flex-col items-center">
+                <p className="text-2xl font-bold text-center mb-4 p-2 rounded">[Potti Kadai logo]</p>
+                <p className="text-2xl font-bold text-center mb-4 p-2 rounded">Welcome Back!</p>
+                <p className="text-xl font-bold text-center mb-4 p-2 rounded">User Login</p>
+            </div>
+            <div className="p-7">
+                <form onSubmit={handleSubmit}>
+                    <div className="mt-4">
+                        <p className="mb-1 ml-3 text-lg font-medium">Email</p>
+                        <Input name="email" type="email" placeholder="Enter your email" onChange={handleChange} className="border w-full p-2 px-3 rounded-full" />
+                        {formErrors.email && <p className="text-red-500">{formErrors.email}</p>}
+                    </div>
+                    <div className="mt-4">
+                        <p className="mb-1 ml-3 text-lg font-medium">Password</p>
+                        <Input name="password" type="password" placeholder="Enter your password" onChange={handleChange} className="border w-full p-2 px-3 rounded-full" />
+                        {formErrors.password && <p className="text-red-500">{formErrors.password}</p>}
+                    </div>
+                    <div className="mt-4 flex justify-center p-5">
+                        <button type="submit" className="py-1 px-7 text-lg font-medium border rounded-full">Login</button>
+                    </div>
+                </form>
+            </div>
+            
         </div>
     );
 }
