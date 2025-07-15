@@ -7,9 +7,9 @@ import './index.css'
 import App from './Routes/AppRoutes.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <Provider store={store}>
       <App />
     </Provider>
-  </StrictMode>,
+  // </StrictMode>,
 )
