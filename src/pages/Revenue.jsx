@@ -1,4 +1,19 @@
+import { useEffect, useState } from "react";
+import { useFetch } from "../utils/mixin";
+
 function Revenue() {
+
+    const [revenue, setRevenue] = useState([]);
+    const _fetch = useFetch();
+
+    useEffect(() => {
+        const response = _fetch('GET', '/revenue', {}, (resp) => {
+            if (resp.status) {
+                setRevenue(resp.revenues);
+            }
+        })
+    }, [])
+
     return (
        <div>
             <div className="flex gap-28 items-center p-3">
@@ -23,16 +38,22 @@ function Revenue() {
                             </tr>
                         </thead>
                         <tbody>
+                        { revenue.map((items, index) => (
                             <tr>
-                                <td>1</td>
-                                <td>2022</td>
-                                <td>1000000</td>
-                                <td>950000</td>
-                                <td>95%</td>
+                                <td>{index + 1}</td>
+                                <td>{items.year}</td>
+                                <td>{items.expected_amount}</td>
+                                <td>{items.collected_amount}</td>
+                                <td>{((items.collected_amount / items.expected_amount) * 100).toFixed(0)}%</td>
                             </tr>
+                        ))}
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <div>
+                
             </div>
        </div>
     )
