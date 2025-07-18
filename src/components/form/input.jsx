@@ -1,4 +1,3 @@
-
 function input(props) {
 
     const handleChange = (e) => {
@@ -10,7 +9,7 @@ function input(props) {
     return (
         <div>
             <label>{props.label}</label>
-            <input type={props.type} name={props.name} placeholder={props.placeholder} className={props.className} onChange={props.onChange}/>
+            <input type={props.type} name={props.name} placeholder={props.placeholder} className={props.className} value={props.value} onChange={props.onChange} readOnly={props.readOnly}/>
         </div>
     )
 }
