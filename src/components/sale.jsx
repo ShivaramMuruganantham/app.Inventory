@@ -30,7 +30,7 @@ function sale() {
 
     useEffect(() => {
         if (selectedYear) {
-            const response = _fetch('GET', `/analysis/sale/monthly/${selectedYear}`, {}, (resp) => {
+            const response = _fetch('GET', `/analysis/sale/graph/${selectedYear}`, {}, (resp) => {
                 if (resp.status) {
                     // console.log(resp.graph);
                     const formattedData = resp.graph.map((item) => ({
@@ -52,7 +52,7 @@ function sale() {
         const response2 = _fetch('GET', `/analysis/sale/revenue/${selectedYear}`, {}, (resp) => {
             if (resp.status) {
                 // console.log(resp);
-                setRevenue(resp.revenue);
+                setRevenue(resp.revenue[0]);
             }
         })
     }, [selectedYear]);
@@ -90,10 +90,10 @@ function sale() {
                         <p className="py-2 text-2xl font-bold text-center">&#8377; {Revenue.collected_amount}</p>
                         <div>
                             <div className="flex justify-between">
-                                <p>50%</p>
-                                <p>&#8377; 2,00,0000</p>
+                                <p>{((Revenue.collected_amount / Revenue.expected_amount) * 100).toFixed(0)}%</p>
+                                <p>&#8377; {Revenue.expected_amount}</p>
                             </div>
-                            <meter value="50" min="0" max="100" className="w-full rounded h-5 "></meter>
+                            <meter value={((Revenue.collected_amount / Revenue.expected_amount) * 100).toFixed(0)} min="0" max="100" className="w-full rounded h-5 "></meter>
                         </div>
                     </div>
                 </div>
