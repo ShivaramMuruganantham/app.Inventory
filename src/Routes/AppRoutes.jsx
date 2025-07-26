@@ -11,6 +11,7 @@ import Register from '../pages/Register'
 import Dashboard from '../pages/Dashboard'
 import Analysis from '../pages/Analysis'
 import Shop from '../pages/Shop'
+import Cart from '../pages/Cart'
 import Revenue from '../pages/Revenue'
 
 import Footer from '../components/footer'
@@ -32,6 +33,7 @@ function AppRoutes() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/analysis" element={<Analysis />} />
           <Route path="/products" element={<Shop />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/revenue" element={<Revenue />} />
         </Routes>
     </div>
