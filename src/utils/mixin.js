@@ -27,7 +27,9 @@ export function useFetch() {
                 requestOptions.body = JSON.stringify(body);
             }
         }
-    
+        
+        // console.log(url);
+        // console.log(requestOptions);
         fetch(url, requestOptions)
         .then(resp => resp.json())
         .then(resp => {
