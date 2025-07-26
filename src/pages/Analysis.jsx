@@ -10,7 +10,7 @@ function Analysis() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="p-5 bg-white border-b border-gray-300 shadow">
+            <div className="p-3 bg-white border-b border-gray-300 shadow">
                 <p className="text-2xl font-medium">Analysis</p>
             </div>
             <div className="pb-14 m-3">
