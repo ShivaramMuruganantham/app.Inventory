@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const apiConfigSlice = createSlice({
-    name: "apiCOnfigSlice",
+    name: "apiConfigSlice",
     initialState: {
         baseURL : 'http://127.0.0.1:8000/api',
     },
