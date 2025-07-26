@@ -101,7 +101,7 @@ function sale() {
             
             <div>
                 <p className="my-1 pt-2 text-xl font-medium">Total sales</p>
-                <div className="p-4 bg-white rounded shadow">
+                <div className="rounded shadow">
                     <table>
                         <thead>
                             <tr>
