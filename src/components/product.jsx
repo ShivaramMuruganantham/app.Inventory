@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { useFetch } from "../utils/mixin"
  
 import AddStockModal from "../components/modal/addStock";
+import image from "../assets/images/Moong.png";
 
 function product() {
 
@@ -15,6 +16,8 @@ function product() {
     const [selectedYear, setSelectedYear] = useState(currentYear);
 
     const [selectedCategory, setSelectedCategory] = useState("");
+    const [filterProduct, setFilterProduct] = useState([]);
+
     const [updateStock, setUpdateStock] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -33,7 +36,7 @@ function product() {
 
         const response2 = _fetch('GET', '/shop/product/category', {}, (resp) => {
             if (resp.status) {
-                // console.log("Categories", resp.categories);
+                console.log("Categories", resp.categories);
                 setCategory(resp.categories);
             }
         })
@@ -72,6 +75,21 @@ function product() {
         return colors[index % colors.length];
     }
 
+    useEffect(() => {
+        if (selectedCategory) {
+            const response = _fetch('GET', `/analysis/product/category/${selectedCategory}`, {}, (resp) => {
+                if (resp.status) {
+                    console.log("products", resp.products);
+                    setFilterProduct(resp.products);
+                }
+            });
+        }
+        else {
+            fetchProducts();
+            setFilterProduct([]);
+        }
+    }, [selectedCategory]);
+
     return (
         <div className="relative">
             <div className="py-5 bg-white shadow">
@@ -105,7 +123,7 @@ function product() {
                 <div className="flex justify-between px-5">
                     <p className="text-lg font-medium">Products</p>
                     <div className="flex gap-5">
-                        <select name="" id="" className="border rounded outline-none" onChange={(e) => setSelectedCategory()}>
+                        <select name="" id="" className="border rounded outline-none" onChange={(e) => setSelectedCategory(e.target.value)}>
                             <option value="">Category</option>
                             {category.map((item, index) => (
                                 <option value={item.id} key={index}>{item.category_name}</option>
@@ -114,26 +132,31 @@ function product() {
                     </div>
                 </div>
                 <div>
-                    <div>
-                        <p>{selectedCategory}</p>
+                    <div className="divide-y">
+                        {(selectedCategory && filterProduct.length === 0) ? (<p className="text-center p-5 text-gray-400 text-xl">No products found</p>) : 
+                            ((filterProduct.length > 0 ? filterProduct : ShowData).map((product, index) => (
+                            <div className="flex justify-between items-center p-3 m-5 text-slate-800" key={index}>
+                                <div className="flex gap-5">
+                                    <img src={image} alt="" className="w-20"/>
+                                    <div className="text-sm">
+                                        <p>{product.name} <span>({ product.quantity })</span></p>
+                                        <p>&#8377; {Number(product.price).toFixed(2) }</p>
+                                        <p>{ product.brand } Maan mark</p>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col">
+                                    <p className="mb-3 text-sm text-black">
+                                        Qty: <span className="font-semibold">{product.inventory[0].stock_qty}</span>
+                                    </p>
+                                    <button className="bg-gray-200 text-gray-800 text-sm px-3 leading-none py-1 rounded-full border border-gray-300" onClick={() => {
+                                        setSelectedProduct(product);
+                                        setUpdateStock(true);
+                                    }}
+                                    >Add</button>
+                                </div>
+                            </div>
+                        )))}
                     </div>
-                    {ShowData.map((product, index) => (
-                        <div className="flex justify-around border p-3 m-5 bg-white" key={index}>
-                            <img src="../assets/images/Moong.png" alt="" className="w-20 border"/>
-                            <div>
-                                <p>{product.name} <span>({ product.quantity })</span></p>
-                                <p>{ product.price }</p>
-                                <p>{ product.brand } </p>
-                            </div>
-                            <div>
-                                <p>{ product.inventory[0].stock_qty }</p>
-                                <button className="border px-3 py-1 text-sm cursor-pointer" onClick={() => {
-                                    setSelectedProduct(product);
-                                    setUpdateStock(true);
-                                }}>Add +</button>
-                            </div>
-                        </div>
-                    ))}
                 </div>
                 <div className="">
                     {updateStock && (
