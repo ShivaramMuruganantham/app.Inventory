@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useFetch } from "../utils/mixin";
 
+import Input from "../components/form/input";
+
 function Revenue() {
 
     const [revenue, setRevenue] = useState([]);
@@ -39,7 +41,7 @@ function Revenue() {
                         </thead>
                         <tbody>
                         { revenue.map((items, index) => (
-                            <tr>
+                            <tr key={index}>
                                 <td>{index + 1}</td>
                                 <td>{items.year}</td>
                                 <td>{items.expected_amount}</td>
@@ -53,7 +55,16 @@ function Revenue() {
             </div>
 
             <div>
-                
+                <form>
+                    <div>
+                        <p>Year :</p>
+                        <Input type="number" name="year" onChange={(e) => console.log(e.target.value)}/>
+                    </div>
+                    <div>
+                        <p>Target Amount :</p>
+                        <Input type="number" name="target" onChange={(e) => console.log(e.target.value)}/>
+                    </div>
+                </form>
             </div>
        </div>
     )
